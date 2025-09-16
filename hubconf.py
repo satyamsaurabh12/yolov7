@@ -37,7 +37,7 @@ def create(name, pretrained, channels, classes, autoshape):
         if pretrained:
             fname = f'{name}.pt'  # checkpoint filename
             attempt_download(fname)  # download if not found locally
-            ckpt = torch.load(fname, map_location=torch.device('cpu'))  # load
+            ckpt = torch.load(fname, map_location=torch.device('cpu'),weights_only=False)  # load
             msd = model.state_dict()  # model state_dict
             csd = ckpt['model'].float().state_dict()  # checkpoint state_dict as FP32
             csd = {k: v for k, v in csd.items() if msd[k].shape == v.shape}  # filter
@@ -59,13 +59,13 @@ def custom(path_or_model='path/to/model.pt', autoshape=True):
 
     Arguments (3 options):
         path_or_model (str): 'path/to/model.pt'
-        path_or_model (dict): torch.load('path/to/model.pt')
-        path_or_model (nn.Module): torch.load('path/to/model.pt')['model']
+        path_or_model (dict): torch.load('path/to/model.pt',weights_only=False)
+        path_or_model (nn.Module): torch.load('path/to/model.pt',weights_only=False)['model']
 
     Returns:
         pytorch model
     """
-    model = torch.load(path_or_model, map_location=torch.device('cpu')) if isinstance(path_or_model, str) else path_or_model  # load checkpoint
+    model = torch.load(path_or_model, map_location=torch.device('cpu'),weights_only=False) if isinstance(path_or_model, str) else path_or_model  # load checkpoint
     if isinstance(model, dict):
         model = model['ema' if model.get('ema') else 'model']  # load model
 
